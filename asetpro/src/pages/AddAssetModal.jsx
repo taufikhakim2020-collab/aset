@@ -13,7 +13,7 @@ const emptyForm = {
   status: 'Tersedia',
 }
 
-function AddAssetModal({ onClose, onSubmit, initialData }) {
+function AddAssetModal({ onClose, onSubmit, initialData, saving }) {
   const isEdit = !!initialData
   const [form, setForm] = useState(() => {
     if (initialData) {
@@ -46,17 +46,18 @@ function AddAssetModal({ onClose, onSubmit, initialData }) {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const statusConfig = {
       'Tersedia': { dotColor: 'bg-on-tertiary-container', bg: 'bg-surface-container-highest', textColor: 'text-on-tertiary-container' },
       'Dipinjam': { dotColor: 'bg-secondary', bg: 'bg-secondary-fixed', textColor: 'text-on-secondary-fixed-variant' },
       'Dalam Perawatan': { dotColor: 'bg-error', bg: 'bg-error-container', textColor: 'text-on-error-container' },
       'Afkir / Rusak': { dotColor: 'bg-outline', bg: 'bg-surface-container', textColor: 'text-on-surface' },
+      'Servis Berkala': { dotColor: 'bg-error', bg: 'bg-error-container', textColor: 'text-on-error-container' },
     }
-    onSubmit({
+    await onSubmit({
       ...form,
-      id: initialData?.id || `AST-${Date.now()}`,
+      id: initialData?.id,
       image: initialData?.image || null,
       icon: initialData?.icon || null,
       iconBg: initialData?.iconBg || 'bg-surface-container-high',
@@ -127,6 +128,7 @@ function AddAssetModal({ onClose, onSubmit, initialData }) {
                 <option>Dipinjam</option>
                 <option>Dalam Perawatan</option>
                 <option>Afkir / Rusak</option>
+                <option>Servis Berkala</option>
               </select>
             </label>
           </div>
@@ -134,8 +136,8 @@ function AddAssetModal({ onClose, onSubmit, initialData }) {
             <button className="h-10 px-space-md rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors" onClick={onClose} type="button">
               Batal
             </button>
-            <button className="h-10 px-space-md rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-95 transition-all" type="submit">
-              {isEdit ? 'Simpan Perubahan' : 'Simpan Aset'}
+            <button className="h-10 px-space-md rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-95 transition-all" type="submit" disabled={saving}>
+              {saving ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan Aset'}
             </button>
           </div>
         </form>

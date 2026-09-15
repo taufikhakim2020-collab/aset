@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import KatalogKPICards from './KatalogKPICards'
@@ -6,137 +6,78 @@ import FilterTabs from './FilterTabs'
 import AssetTable from './AssetTable'
 import AssetPreview from './AssetPreview'
 import AddAssetModal from './AddAssetModal'
-
-const initialAssets = [
-  {
-    id: 'AST-NB-0428',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCxDOcsjfe7ivE_HcoxncXIDcuzdYyNpPW2eaU2vvyQS3HIh2mU6GM_yJXy247dpgamtf4DC72D7UmW-l-EPjZvNjVrpqpEutZM_AuNMm-8btOBGqI6WWkEfApHxng-DEhDZhGy8HT7KeVve_LxSYVhPwVhtxwyJBTh7YLo-88NdPBM0VDospTu60GD-6O3SUlnfLdDV_jRf4ylge-RZ2MRnTEaGgUYGHwMVXK7YlXVRXG9RS8QisVx',
-    name: 'MacBook Pro 14" M3 Pro',
-    brand: 'Apple',
-    category: 'IT Hardware',
-    code: 'AST-NB-0428',
-    serial: 'C02GJ827MD6T',
-    location: 'HQ Jakarta',
-    subLocation: 'Lt. 4 Engineering',
-    value: 'Rp 29.500.000',
-    date: '14 Mar 2024',
-    status: { label: 'Tersedia', dotColor: 'bg-on-tertiary-container', bg: 'bg-surface-container-highest', textColor: 'text-on-tertiary-container' },
-  },
-  {
-    id: 'AST-NB-0391',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDMsq_HlIkxZCr6wcUBGg_WQVbp1W1EGTWCppPThgU4jSPsvKGTrzFW2XiJ6Y4ZBaC-if8GTDR1tpIbI0ngjBK_eFyWShYI8sPGP7Px_YkYRlTVRh3Q0OF5SjljPb0_M9ExLCApDgJhkdlrOkwh_sgfv1dT3nasBANLZy55BO_1ByuX-hpoaGYpolKugeECPkc4tqBhi5QyXD9XMx5X46lNueTg-WgJKzjYIqp1lLJCIX4iIJ-rsO39',
-    name: 'ThinkPad P16s Gen 2',
-    brand: 'Lenovo',
-    category: 'IT Hardware',
-    code: 'AST-NB-0391',
-    serial: 'PF4D92LX8801',
-    location: 'HQ Jakarta',
-    subLocation: 'Lt. 3 Data Analytics',
-    value: 'Rp 23.400.000',
-    date: '18 Jan 2024',
-    status: { label: 'Dipinjam', dotColor: 'bg-secondary', bg: 'bg-secondary-fixed', textColor: 'text-on-secondary-fixed-variant' },
-  },
-  {
-    id: 'AST-NET-0112',
-    image: null,
-    icon: 'router',
-    iconBg: 'bg-surface-container-high',
-    name: 'Cisco Catalyst 2960-X',
-    brand: 'Cisco',
-    category: 'Perangkat Jaringan',
-    code: 'AST-NET-0112',
-    serial: 'FCW2219B0QZ',
-    location: 'Sentra Data BSD',
-    subLocation: 'Rack Server 02A',
-    value: 'Rp 18.250.000',
-    date: '11 Nov 2023',
-    status: { label: 'Tersedia', dotColor: 'bg-on-tertiary-container', bg: 'bg-surface-container-highest', textColor: 'text-on-tertiary-container' },
-  },
-  {
-    id: 'AST-VH-0024',
-    image: null,
-    icon: 'directions_car',
-    iconBg: 'bg-surface-container-high',
-    name: 'Toyota Avanza 1.5 G CVT',
-    brand: 'Toyota',
-    category: 'Armada Operasional',
-    code: 'AST-VH-0024',
-    serial: 'B 1842 POL (MHKM)',
-    location: 'Pool Slipi',
-    subLocation: 'Area Parkir B2',
-    value: 'Rp 269.000.000',
-    date: '05 Agu 2022',
-    status: { label: 'Servis Berkala', dotColor: 'bg-error', bg: 'bg-error-container', textColor: 'text-on-error-container' },
-  },
-  {
-    id: 'AST-CAM-0087',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDX33Fq9lS6P_cObtxjed_SaZ9e1CttVQ12mv-_C9AWq9rAxxrY_ouWgw0SxOUNjkYH83uO6YxOq-6cFuXqB6MInpmS-2cZP-i7YViullKYixex3Wup9GAm2DdBZmjEVc39AO8PpJiO4W55a-WPbZLaswgW6wjiYnFxPTMvd_Of0lUS9xqbiz5fdDvUeHiBzS59PdgGmW-7Tsss5sWrY6fkMtXN0Od6iHSxxE09qKmOw7u8W8ot2M8x',
-    name: 'Sony FX3 Cinema Camera',
-    brand: 'Sony',
-    category: 'Multimedia & Video',
-    code: 'AST-CAM-0087',
-    serial: 'SN-3910582-JK',
-    location: 'HQ Jakarta',
-    subLocation: 'Lt. 2 Studio Utama',
-    value: 'Rp 58.900.000',
-    date: '02 Des 2023',
-    status: { label: 'Dipinjam', dotColor: 'bg-secondary', bg: 'bg-secondary-fixed', textColor: 'text-on-secondary-fixed-variant' },
-  },
-  {
-    id: 'AST-FUR-0519',
-    image: null,
-    icon: 'table_restaurant',
-    iconBg: 'bg-surface-container-high',
-    name: 'Steelcase Migration Desk',
-    brand: 'Steelcase',
-    category: 'Furnitur Kantor',
-    code: 'AST-FUR-0519',
-    serial: 'SC-MIG-2022-81',
-    location: 'HQ Jakarta',
-    subLocation: 'Lt. 3 Co-working',
-    value: 'Rp 14.800.000',
-    date: '19 Jun 2022',
-    status: { label: 'Tersedia', dotColor: 'bg-on-tertiary-container', bg: 'bg-surface-container-highest', textColor: 'text-on-tertiary-container' },
-  },
-  {
-    id: 'AST-LOG-0004',
-    image: null,
-    icon: 'forklift',
-    iconBg: 'bg-surface-container-high',
-    name: 'Toyota 8FBN25 Elektrik Forklift',
-    brand: 'Toyota Material',
-    category: 'Alat Berat Gudang',
-    code: 'AST-LOG-0004',
-    serial: 'TY-8FBN25-9932',
-    location: 'Gudang Cikarang',
-    subLocation: 'Zona Muat 01',
-    value: 'Rp 340.000.000',
-    date: '10 Feb 2021',
-    status: { label: 'Tersedia', dotColor: 'bg-on-tertiary-container', bg: 'bg-surface-container-highest', textColor: 'text-on-tertiary-container' },
-  },
-]
+import { fetchAssets, createAsset, updateAsset, deleteAsset } from '../lib/assetApi'
 
 function KatalogAset() {
-  const [assets, setAssets] = useState(initialAssets)
+  const [assets, setAssets] = useState([])
   const [selectedAsset, setSelectedAsset] = useState(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingAsset, setEditingAsset] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
-  const handleAddAsset = (newAsset) => {
-    setAssets((prev) => [newAsset, ...prev])
-  }
+  useEffect(() => {
+    loadAssets()
+  }, [])
 
-  const handleDeleteAsset = (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus aset ini?')) {
-      setAssets((prev) => prev.filter((item) => item.id !== id))
-      setSelectedAsset(null)
+  const loadAssets = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const data = await fetchAssets()
+      setAssets(data)
+      if (data.length > 0) {
+        setSelectedAsset(data[0])
+      }
+    } catch (err) {
+      console.error('Failed to load assets:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleEditAsset = (updatedAsset) => {
-    setAssets((prev) => prev.map((item) => (item.id === updatedAsset.id ? updatedAsset : item)))
-    setEditingAsset(null)
-    setSelectedAsset(updatedAsset)
+  const handleAddAsset = async (newAsset) => {
+    try {
+      setSaving(true)
+      const created = await createAsset(newAsset)
+      setAssets((prev) => [created, ...prev])
+      setSelectedAsset(created)
+    } catch (err) {
+      console.error('Failed to add asset:', err)
+      alert('Gagal menambahkan aset: ' + err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteAsset = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus aset ini?')) {
+      try {
+        await deleteAsset(id)
+        setAssets((prev) => prev.filter((item) => item.id !== id))
+        setSelectedAsset(null)
+      } catch (err) {
+        console.error('Failed to delete asset:', err)
+        alert('Gagal menghapus aset: ' + err.message)
+      }
+    }
+  }
+
+  const handleEditAsset = async (updatedAsset) => {
+    try {
+      setSaving(true)
+      const saved = await updateAsset(updatedAsset.id, updatedAsset)
+      setAssets((prev) => prev.map((item) => (item.id === saved.id ? saved : item)))
+      setEditingAsset(null)
+      setSelectedAsset(saved)
+    } catch (err) {
+      console.error('Failed to update asset:', err)
+      alert('Gagal memperbarui aset: ' + err.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -165,12 +106,23 @@ function KatalogAset() {
                   <span className="material-symbols-outlined text-[18px]">file_upload</span>
                   <span>Impor Excel</span>
                 </button>
-                <button className="h-10 px-space-md bg-primary-container text-on-primary rounded-lg font-label-md text-label-md shadow-md hover:opacity-95 transition-all flex items-center gap-space-xs" onClick={() => setShowAddModal(true)} type="button">
+                <button
+                  className="h-10 px-space-md bg-primary-container text-on-primary rounded-lg font-label-md text-label-md shadow-md hover:opacity-95 transition-all flex items-center gap-space-xs"
+                  onClick={() => setShowAddModal(true)}
+                  type="button"
+                >
                   <span className="material-symbols-outlined text-[20px]">add</span>
                   <span>Tambah Aset Baru</span>
                 </button>
               </div>
             </div>
+
+            {error && (
+              <div className="mb-space-md rounded-lg bg-error-container px-space-md py-3 text-on-error-container font-body-sm">
+                Gagal memuat data dari Supabase: {error}
+              </div>
+            )}
+
             <KatalogKPICards />
             <FilterTabs />
             <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm mb-space-md flex flex-col lg:flex-row items-center justify-between gap-space-md">
@@ -228,16 +180,23 @@ function KatalogAset() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col xl:flex-row gap-space-lg items-start">
-              <AssetTable
-                assets={assets}
-                onSelectAsset={setSelectedAsset}
-                selectedAssetId={selectedAsset?.id}
-                onEdit={setEditingAsset}
-                onDelete={handleDeleteAsset}
-              />
-              <AssetPreview asset={selectedAsset} />
-            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-space-lg text-on-surface-variant">
+                Memuat data aset...
+              </div>
+            ) : (
+              <div className="flex flex-col xl:flex-row gap-space-lg items-start">
+                <AssetTable
+                  assets={assets}
+                  onSelectAsset={setSelectedAsset}
+                  selectedAssetId={selectedAsset?.id}
+                  onEdit={setEditingAsset}
+                  onDelete={handleDeleteAsset}
+                />
+                <AssetPreview asset={selectedAsset} />
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -246,6 +205,7 @@ function KatalogAset() {
         <AddAssetModal
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddAsset}
+          saving={saving}
         />
       )}
 
@@ -254,6 +214,7 @@ function KatalogAset() {
           initialData={editingAsset}
           onClose={() => setEditingAsset(null)}
           onSubmit={handleEditAsset}
+          saving={saving}
         />
       )}
     </div>
