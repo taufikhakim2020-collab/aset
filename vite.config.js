@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  root: 'asetpro', // Tells Vite to look inside asetpro for index.html
+  plugins: [react()],
+  root: 'asetpro', // Points Vite to look inside the asetpro folder
   build: {
-    outDir: '../dist', // Places the built files back into a dist folder in the root
+    outDir: '../dist', // Builds the production files into the root dist folder
+    emptyOutDir: true
   }
 })
